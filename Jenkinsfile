@@ -12,6 +12,7 @@ pipeline {
 
     environment {
         MVNW = "mvnw.cmd"
+        MAVEN_REPO = "%WORKSPACE%\\.m2repo"
     }
 
     stages {
@@ -24,13 +25,13 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat "${env.MVNW} -B -DskipTests clean package"
+                bat "${env.MVNW} -B -Dmaven.repo.local=${env.MAVEN_REPO} -DskipTests clean package"
             }
         }
 
         stage('Test + JaCoCo Coverage') {
             steps {
-                bat "${env.MVNW} -B org.jacoco:jacoco-maven-plugin:prepare-agent test org.jacoco:jacoco-maven-plugin:report"
+                bat "${env.MVNW} -B -Dmaven.repo.local=${env.MAVEN_REPO} org.jacoco:jacoco-maven-plugin:prepare-agent test org.jacoco:jacoco-maven-plugin:report"
             }
             post {
                 always {
