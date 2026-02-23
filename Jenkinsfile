@@ -12,7 +12,7 @@ pipeline {
 
     environment {
         MVNW = "mvnw.cmd"
-        MAVEN_REPO = "${env.WORKSPACE}\\.m2repo"
+        MAVEN_REPO = "${WORKSPACE}\\.m2repo"
     }
 
     stages {
@@ -29,23 +29,15 @@ pipeline {
             }
         }
 
-        stage('Test + JaCoCo Coverage') {
+        stage('Test + Coverage') {
             steps {
-                bat """
-                ${env.MVNW} -B ^
-                -Dmaven.repo.local=${env.MAVEN_REPO} ^
-                -Dcheckstyle.skip=true ^
-                org.jacoco:jacoco-maven-plugin:prepare-agent ^
-                test ^
-                org.jacoco:jacoco-maven-plugin:report
-                """
+                bat "${env.MVNW} -B -Dmaven.repo.local=${env.MAVEN_REPO} -Dcheckstyle.skip=true test"
             }
         }
 
-        stage('Archive Artifacts') {
+        stage('Archive Artifact') {
             steps {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-                archiveArtifacts artifacts: 'target/site/jacoco/**/*', fingerprint: true
             }
         }
     }
