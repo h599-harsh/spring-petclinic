@@ -31,20 +31,21 @@ pipeline {
 
         stage('Test + JaCoCo Coverage') {
             steps {
-                bat "${env.MVNW} -B -Dmaven.repo.local=${env.MAVEN_REPO} -Dcheckstyle.skip=true org.jacoco:jacoco-maven-plugin:prepare-agent test org.jacoco:jacoco-maven-plugin:report"
-            }
-            post {
-                always {
-                    jacoco execPattern: '**/target/jacoco.exec',
-                           classPattern: '**/target/classes',
-                           sourcePattern: '**/src/main/java'
-                }
+                bat """
+                ${env.MVNW} -B ^
+                -Dmaven.repo.local=${env.MAVEN_REPO} ^
+                -Dcheckstyle.skip=true ^
+                org.jacoco:jacoco-maven-plugin:prepare-agent ^
+                test ^
+                org.jacoco:jacoco-maven-plugin:report
+                """
             }
         }
 
-        stage('Archive Artifact') {
+        stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                archiveArtifacts artifacts: 'target/site/jacoco/**/*', fingerprint: true
             }
         }
     }
